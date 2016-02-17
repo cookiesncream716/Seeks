@@ -9,14 +9,19 @@ class UsersController < ApplicationController
 	def new
 	end
 	def create
-		@user = User.new(name: params[:name], email: params[:email], password: params[:password])
-		if @user.valid? ==true
-			@user.save
-			session[:user_id] = @user.id
-			session[:user_name] = @user.name
-			redirect_to "/users/%d" % @user.id
+		if params[:password] == params[:password_confirmation]
+			@user = User.new(name: params[:name], email: params[:email], password: params[:password], password_confirmation: params[:password_confirmation])
+			if @user.valid? ==true
+				@user.save
+				session[:user_id] = @user.id
+				session[:user_name] = @user.name
+				redirect_to "/users/%d" % @user.id
+			else
+				flash[:mistakes] = @user.errors.full_messages
+				redirect_to "/users/new"
+			end
 		else
-			flash[:mistakes] = @user.errors.full_messages
+			flash[:wrong] = "Password and Password Confirmation much match"
 			redirect_to "/users/new"
 		end
 	end
